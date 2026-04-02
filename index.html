@@ -6,53 +6,194 @@
   <title>룰렛</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
       background: #1a1a2e;
       color: #eee;
       font-family: 'Apple SD Gothic Neo', 'Nanum Gothic', sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       min-height: 100vh;
-      gap: 40px;
-      padding: 30px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 24px;
+      padding: 30px 20px;
     }
 
+    /* ── 입력 패널 ── */
+    .input-section {
+      width: 210px;
+      flex-shrink: 0;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .panel-title {
+      font-size: 14px;
+      color: #aaa;
+      text-align: center;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding-bottom: 10px;
+    }
+    .name-input-row {
+      display: flex;
+      gap: 6px;
+    }
+    #nameInput {
+      flex: 1;
+      min-width: 0;
+      padding: 8px 10px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 8px;
+      color: #eee;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+    }
+    #nameInput:focus { border-color: #4dabf7; }
+    #addBtn {
+      padding: 8px 12px;
+      background: #4dabf7;
+      border: none;
+      border-radius: 8px;
+      color: #1a1a2e;
+      font-weight: bold;
+      font-size: 18px;
+      cursor: pointer;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    #addBtn:hover { background: #74c0fc; }
+    #addBtn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    #nameInputList {
+      list-style: none;
+      overflow-y: auto;
+      max-height: 300px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    #nameInputList li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 10px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 7px;
+      font-size: 14px;
+      animation: fadeIn 0.3s ease;
+    }
+    #nameInputList li button {
+      background: none;
+      border: none;
+      color: #888;
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+      padding: 0 2px;
+      flex-shrink: 0;
+    }
+    #nameInputList li button:hover { color: #ff6b6b; }
+    #nameInputList li button:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    #inputCount { font-size: 12px; color: #666; text-align: center; }
+
+    .input-actions { display: flex; gap: 8px; }
+    #startRoulette {
+      flex: 1;
+      padding: 10px 6px;
+      background: linear-gradient(135deg, #ff4757, #ff6b81);
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-weight: bold;
+      font-size: 13px;
+      cursor: pointer;
+      box-shadow: 0 3px 12px rgba(255,71,87,0.4);
+      transition: transform 0.1s;
+    }
+    #startRoulette:hover:not(:disabled) { transform: translateY(-1px); }
+    #startRoulette:disabled { opacity: 0.4; cursor: not-allowed; }
+    #clearBtn {
+      padding: 10px 10px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 10px;
+      color: #aaa;
+      font-size: 12px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    #clearBtn:hover { background: rgba(255,255,255,0.14); }
+
+    /* ── 휠 섹션 ── */
     .wheel-section {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 24px;
+      gap: 18px;
+      flex-shrink: 0;
     }
-
     .wheel-wrapper {
       position: relative;
-      width: 480px;
-      height: 480px;
+      width: 460px;
+      height: 460px;
     }
-
     .pointer {
       position: absolute;
-      top: -18px;
+      top: -16px;
       left: 50%;
       transform: translateX(-50%);
-      width: 0;
-      height: 0;
-      border-left: 14px solid transparent;
-      border-right: 14px solid transparent;
-      border-top: 30px solid #ff4757;
-      filter: drop-shadow(0 2px 6px rgba(255,71,87,0.8));
       z-index: 10;
+      width: 26px;
+      height: 36px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
-
+    .pointer::before {
+      content: '';
+      width: 0; height: 0;
+      border-left: 13px solid transparent;
+      border-right: 13px solid transparent;
+      border-top: 28px solid #ff4757;
+      filter: drop-shadow(0 2px 6px rgba(255,71,87,0.8));
+    }
     canvas {
       border-radius: 50%;
       box-shadow: 0 0 40px rgba(255,255,255,0.1);
+      display: block;
     }
-
-    #startBtn {
-      padding: 14px 60px;
-      font-size: 20px;
+    .empty-wheel-msg {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: #555;
+      text-align: center;
+      line-height: 2;
+      pointer-events: none;
+      border-radius: 50%;
+      border: 2px dashed rgba(255,255,255,0.08);
+    }
+    #resultMsg {
+      font-size: 22px;
+      font-weight: bold;
+      color: #ffd700;
+      min-height: 30px;
+      text-align: center;
+      text-shadow: 0 0 12px rgba(255,215,0,0.6);
+    }
+    #spinBtn {
+      padding: 13px 56px;
+      font-size: 19px;
       font-weight: bold;
       background: linear-gradient(135deg, #ff4757, #ff6b81);
       color: white;
@@ -62,180 +203,285 @@
       box-shadow: 0 4px 20px rgba(255,71,87,0.5);
       transition: transform 0.1s, box-shadow 0.1s;
     }
-    #startBtn:hover:not(:disabled) {
+    #spinBtn:hover:not(:disabled) {
       transform: translateY(-2px);
       box-shadow: 0 6px 24px rgba(255,71,87,0.7);
     }
-    #startBtn:active:not(:disabled) { transform: translateY(0); }
-    #startBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+    #spinBtn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-    #resultMsg {
-      font-size: 22px;
-      font-weight: bold;
-      color: #ffd700;
-      min-height: 32px;
-      text-align: center;
-      text-shadow: 0 0 12px rgba(255,215,0,0.6);
-    }
-
+    /* ── 결과 리스트 ── */
     .list-section {
-      width: 220px;
+      width: 190px;
+      flex-shrink: 0;
       background: rgba(255,255,255,0.05);
       border: 1px solid rgba(255,255,255,0.1);
       border-radius: 16px;
-      padding: 20px;
+      padding: 18px;
       display: flex;
       flex-direction: column;
       gap: 10px;
-      max-height: 560px;
     }
-
-    .list-section h2 {
-      font-size: 16px;
-      color: #aaa;
-      text-align: center;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-      padding-bottom: 10px;
-    }
-
     #selectedList {
       list-style: none;
       overflow-y: auto;
-      flex: 1;
+      max-height: 420px;
       display: flex;
       flex-direction: column;
       gap: 6px;
     }
-
     #selectedList li {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 8px 12px;
+      gap: 8px;
+      padding: 7px 10px;
       background: rgba(255,255,255,0.07);
       border-radius: 8px;
-      font-size: 15px;
+      font-size: 14px;
       animation: fadeIn 0.4s ease;
     }
-    #selectedList li .num {
-      font-size: 12px;
-      color: #888;
-      min-width: 22px;
-    }
+    #selectedList li .num { font-size: 11px; color: #777; min-width: 18px; }
     #selectedList li.latest {
       background: rgba(255,71,87,0.25);
       border: 1px solid rgba(255,71,87,0.5);
     }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateX(10px); }
-      to   { opacity: 1; transform: translateX(0); }
-    }
-
     #completeMsg {
       display: none;
-      font-size: 15px;
+      font-size: 13px;
       color: #7bed9f;
       text-align: center;
-      padding: 10px;
+      padding: 8px;
       border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    /* ── 모바일 반응형 ── */
+    @media (max-width: 820px) {
+      body {
+        flex-direction: column;
+        align-items: center;
+        padding: 16px 12px 30px;
+        gap: 16px;
+      }
+      .input-section, .list-section {
+        width: 100%;
+        max-width: 500px;
+      }
+      #nameInputList { max-height: 160px; }
+      .wheel-wrapper {
+        width: min(90vw, 460px);
+        height: min(90vw, 460px);
+      }
+      #resultMsg { font-size: 18px; }
+      #spinBtn { padding: 12px 48px; font-size: 17px; }
+      .list-section { max-width: 500px; }
+      #selectedList { max-height: 200px; }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateX(8px); }
+      to   { opacity: 1; transform: translateX(0); }
     }
   </style>
 </head>
 <body>
 
+<div class="input-section">
+  <div class="panel-title">이름 입력</div>
+  <div class="name-input-row">
+    <input id="nameInput" type="text" placeholder="이름 입력" maxlength="10">
+    <button id="addBtn">+</button>
+  </div>
+  <ul id="nameInputList"></ul>
+  <div id="inputCount">0명 입력됨</div>
+  <div class="input-actions">
+    <button id="startRoulette" disabled>룰렛 시작</button>
+    <button id="clearBtn">초기화</button>
+  </div>
+</div>
+
 <div class="wheel-section">
-  <div class="wheel-wrapper">
+  <div class="wheel-wrapper" id="wheelWrapper">
     <div class="pointer"></div>
-    <canvas id="wheel" width="480" height="480"></canvas>
+    <canvas id="wheel"></canvas>
+    <div class="empty-wheel-msg" id="emptyMsg">왼쪽에서<br>이름을 입력하고<br>룰렛을 시작하세요</div>
   </div>
   <div id="resultMsg"></div>
-  <button id="startBtn">START</button>
+  <button id="spinBtn" disabled>START</button>
 </div>
 
 <div class="list-section">
-  <h2>선택 순서</h2>
+  <div class="panel-title">선택 순서</div>
   <ul id="selectedList"></ul>
-  <div id="completeMsg">🎉 모두 선택 완료!</div>
+  <div id="completeMsg">모두 선택 완료!</div>
 </div>
 
 <script>
-  const NAMES = [
-    "정예한","정우희","조소은","최예빈","태은수",
-    "성아윤","서아윤","서이준","윤유찬","임윤우",
-    "이도현","이하림","이현우","정서율","강가희",
-    "고예준","권명진","김동욱","김보혜","김서윤",
-    "김예린","김하선","박서하"
-  ];
-
   const COLORS = [
     "#ff6b6b","#ffa94d","#ffd43b","#a9e34b","#4dabf7",
     "#748ffc","#da77f2","#f783ac","#63e6be","#74c0fc",
     "#ff8787","#ffb347","#ffe066","#c0eb75","#66d9e8",
     "#91a7ff","#e599f7","#f0a6b2","#38d9a9","#4fc3f7",
-    "#ff922b","#7950f2","#20c997"
+    "#ff922b","#7950f2","#20c997","#f06595","#69db7c",
   ];
 
-  const canvas = document.getElementById('wheel');
-  const ctx = canvas.getContext('2d');
-  const startBtn = document.getElementById('startBtn');
-  const resultMsg = document.getElementById('resultMsg');
+  const canvas       = document.getElementById('wheel');
+  const ctx          = canvas.getContext('2d');
+  const wheelWrapper = document.getElementById('wheelWrapper');
+  const nameInput    = document.getElementById('nameInput');
+  const addBtn       = document.getElementById('addBtn');
+  const nameInputList= document.getElementById('nameInputList');
+  const inputCount   = document.getElementById('inputCount');
+  const startRoulette= document.getElementById('startRoulette');
+  const clearBtn     = document.getElementById('clearBtn');
+  const spinBtn      = document.getElementById('spinBtn');
+  const resultMsg    = document.getElementById('resultMsg');
   const selectedList = document.getElementById('selectedList');
-  const completeMsg = document.getElementById('completeMsg');
+  const completeMsg  = document.getElementById('completeMsg');
+  const emptyMsg     = document.getElementById('emptyMsg');
 
-  let remaining = [...NAMES];
-  let colorMap = {};
-  NAMES.forEach((name, i) => { colorMap[name] = COLORS[i % COLORS.length]; });
+  let inputNames = [];
+  let remaining  = [];
+  let colorMap   = {};
+  let rotation   = 0;
+  let spinning   = false;
+  let rouletteStarted = false;
 
-  let rotation = 0;
-  let spinning = false;
-  let animId = null;
+  // ── 캔버스 크기 동적 조정 ──────────────────
+  function resizeCanvas() {
+    const size = Math.min(460, window.innerWidth * 0.9);
+    canvas.width  = size;
+    canvas.height = size;
+    wheelWrapper.style.width  = size + 'px';
+    wheelWrapper.style.height = size + 'px';
+    drawWheel();
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
 
+  // ── 이름 입력 ──────────────────────────────
+  function addName() {
+    const val = nameInput.value.trim();
+    if (!val) return;
+    if (inputNames.includes(val)) { nameInput.select(); return; }
+    inputNames.push(val);
+    nameInput.value = '';
+    nameInput.focus();
+    renderInputList();
+  }
+
+  function removeName(idx) {
+    inputNames.splice(idx, 1);
+    renderInputList();
+  }
+
+  function renderInputList() {
+    nameInputList.innerHTML = '';
+    inputNames.forEach((name, i) => {
+      const li = document.createElement('li');
+      const span = document.createElement('span');
+      span.textContent = name;
+      const btn = document.createElement('button');
+      btn.textContent = '×';
+      btn.onclick = () => removeName(i);
+      li.appendChild(span);
+      li.appendChild(btn);
+      nameInputList.appendChild(li);
+    });
+    inputCount.textContent = `${inputNames.length}명 입력됨`;
+    startRoulette.disabled = inputNames.length < 2;
+  }
+
+  addBtn.addEventListener('click', addName);
+  nameInput.addEventListener('keydown', e => { if (e.key === 'Enter') addName(); });
+
+  clearBtn.addEventListener('click', () => {
+    if (rouletteStarted) {
+      rouletteStarted = false;
+      remaining = [];
+      rotation  = 0;
+      spinning  = false;
+      resultMsg.textContent = '';
+      selectedList.innerHTML = '';
+      completeMsg.style.display = 'none';
+      spinBtn.disabled = true;
+      spinBtn.textContent = 'START';
+      emptyMsg.style.display = 'flex';
+      drawWheel();
+      setInputLock(false);
+    }
+    inputNames = [];
+    renderInputList();
+  });
+
+  startRoulette.addEventListener('click', () => {
+    if (inputNames.length < 2) return;
+    colorMap = {};
+    inputNames.forEach((name, i) => { colorMap[name] = COLORS[i % COLORS.length]; });
+    remaining = [...inputNames];
+    rotation  = 0;
+    rouletteStarted = true;
+    resultMsg.textContent = '';
+    selectedList.innerHTML = '';
+    completeMsg.style.display = 'none';
+    spinBtn.disabled = false;
+    spinBtn.textContent = 'START';
+    emptyMsg.style.display = 'none';
+    setInputLock(true);
+    drawWheel();
+  });
+
+  function setInputLock(locked) {
+    nameInput.disabled = locked;
+    addBtn.disabled    = locked;
+    startRoulette.disabled = locked;
+    nameInputList.querySelectorAll('button').forEach(b => b.disabled = locked);
+    clearBtn.textContent = locked ? '처음으로' : '초기화';
+  }
+
+  // ── 휠 그리기 ──────────────────────────────
   function drawWheel() {
-    const cx = canvas.width / 2;
-    const cy = canvas.height / 2;
-    const r = cx - 4;
-    const n = remaining.length;
+    const size = canvas.width;
+    const cx   = size / 2;
+    const cy   = size / 2;
+    const r    = cx - 4;
+    const n    = remaining.length;
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
+    ctx.clearRect(0, 0, size, size);
     if (n === 0) return;
 
     const sliceAngle = (2 * Math.PI) / n;
 
     for (let i = 0; i < n; i++) {
       const start = rotation + i * sliceAngle;
-      const end = start + sliceAngle;
+      const end   = start + sliceAngle;
 
-      // Slice
+      // 조각
       ctx.beginPath();
       ctx.moveTo(cx, cy);
       ctx.arc(cx, cy, r, start, end);
       ctx.closePath();
       ctx.fillStyle = colorMap[remaining[i]];
       ctx.fill();
-      ctx.strokeStyle = 'rgba(0,0,0,0.25)';
+      ctx.strokeStyle = 'rgba(0,0,0,0.3)';
       ctx.lineWidth = 1.5;
       ctx.stroke();
 
-      // Text
+      // 텍스트
       ctx.save();
       ctx.translate(cx, cy);
       ctx.rotate(start + sliceAngle / 2);
       ctx.textAlign = 'right';
       ctx.fillStyle = '#fff';
-      const fontSize = n <= 10 ? 16 : n <= 16 ? 13 : 11;
+      const fontSize = n <= 8 ? 17 : n <= 14 ? 14 : n <= 20 ? 12 : 10;
       ctx.font = `bold ${fontSize}px 'Apple SD Gothic Neo', sans-serif`;
-      ctx.shadowColor = 'rgba(0,0,0,0.6)';
+      ctx.shadowColor = 'rgba(0,0,0,0.7)';
       ctx.shadowBlur = 3;
-      const textR = r * 0.82;
-      ctx.fillText(remaining[i], textR, fontSize / 3);
+      ctx.fillText(remaining[i], r * 0.84, fontSize / 3);
       ctx.restore();
     }
 
-    // Center circle
+    // 가운데 원
     ctx.beginPath();
-    ctx.arc(cx, cy, 22, 0, 2 * Math.PI);
+    ctx.arc(cx, cy, 18, 0, 2 * Math.PI);
     ctx.fillStyle = '#1a1a2e';
     ctx.fill();
     ctx.strokeStyle = 'rgba(255,255,255,0.3)';
@@ -243,78 +489,80 @@
     ctx.stroke();
   }
 
-  function getSelected() {
-    const n = remaining.length;
-    const sliceAngle = (2 * Math.PI) / n;
-    // Pointer is at top = -PI/2. Normalize rotation to find which slice is at top.
-    const pointerAngle = -Math.PI / 2;
-    // Normalize: find angle relative to rotation
-    let angle = ((pointerAngle - rotation) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
-    const idx = Math.floor(angle / sliceAngle) % n;
-    return idx;
-  }
+  function easeOut(t) { return 1 - Math.pow(1 - t, 4); }
 
-  function easeOut(t) {
-    return 1 - Math.pow(1 - t, 4);
-  }
-
-  function spin() {
+  // ── 스핀 ───────────────────────────────────
+  spinBtn.addEventListener('click', () => {
     if (spinning || remaining.length === 0) return;
     spinning = true;
-    startBtn.disabled = true;
+    spinBtn.disabled = true;
     resultMsg.textContent = '';
 
-    // Remove 'latest' from previous
     const prev = selectedList.querySelector('.latest');
     if (prev) prev.classList.remove('latest');
 
-    const totalRotation = (5 + Math.random() * 5) * 2 * Math.PI; // 5~10 full turns
-    const duration = 3500 + Math.random() * 1000;
-    const startTime = performance.now();
+    const n          = remaining.length;
+    const sliceAngle = (2 * Math.PI) / n;
+
+    // 당첨자를 미리 무작위 결정
+    const winnerIdx  = Math.floor(Math.random() * n);
+
+    // 포인터(12시 = -π/2)가 당첨 조각의 정중앙에 오도록 목표 회전각 계산
+    // 조각 i의 중심 절대각 = rotation + (i + 0.5) * sliceAngle
+    // 목표: rotation_final + (winnerIdx + 0.5) * sliceAngle ≡ -π/2  (mod 2π)
+    // => rotation_final ≡ -π/2 - (winnerIdx + 0.5) * sliceAngle  (mod 2π)
+    const targetBase = ((-Math.PI / 2 - (winnerIdx + 0.5) * sliceAngle) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
+
+    // 현재 rotation에서 targetBase까지 앞으로 돌아야 할 각도 (최소 5바퀴 + 랜덤 최대 3바퀴)
+    let forwardDiff = (targetBase - rotation % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
+    if (forwardDiff < 0.01) forwardDiff += 2 * Math.PI; // 같은 자리 방지
+    const totalRotation = (5 + Math.floor(Math.random() * 4)) * 2 * Math.PI + forwardDiff;
+
+    const duration      = 3800 + Math.random() * 800;
+    const startTime     = performance.now();
     const startRotation = rotation;
 
     function frame(now) {
-      const elapsed = now - startTime;
-      const t = Math.min(elapsed / duration, 1);
+      const t = Math.min((now - startTime) / duration, 1);
       rotation = startRotation + totalRotation * easeOut(t);
       drawWheel();
 
       if (t < 1) {
-        animId = requestAnimationFrame(frame);
+        requestAnimationFrame(frame);
       } else {
-        rotation = startRotation + totalRotation;
+        rotation = startRotation + totalRotation; // 정확히 목표 위치로 고정
         drawWheel();
         spinning = false;
 
-        const idx = getSelected();
-        const winner = remaining[idx];
-        remaining.splice(idx, 1);
+        const winner = remaining[winnerIdx];
+        remaining.splice(winnerIdx, 1);
 
-        // Show result
         resultMsg.textContent = `🎉 ${winner}`;
 
-        // Add to list
         const li = document.createElement('li');
         li.classList.add('latest');
-        li.innerHTML = `<span class="num">${selectedList.children.length + 1}.</span>${winner}`;
+        const numSpan = document.createElement('span');
+        numSpan.className = 'num';
+        numSpan.textContent = (selectedList.children.length + 1) + '.';
+        li.appendChild(numSpan);
+        li.appendChild(document.createTextNode(winner));
         selectedList.appendChild(li);
         selectedList.scrollTop = selectedList.scrollHeight;
 
         if (remaining.length === 0) {
-          startBtn.disabled = true;
-          startBtn.textContent = '완료';
+          spinBtn.disabled = true;
+          spinBtn.textContent = '완료';
           completeMsg.style.display = 'block';
         } else {
-          startBtn.disabled = false;
+          spinBtn.disabled = false;
           drawWheel();
         }
       }
     }
 
-    animId = requestAnimationFrame(frame);
-  }
+    requestAnimationFrame(frame);
+  });
 
-  startBtn.addEventListener('click', spin);
   drawWheel();
 </script>
 </body>
